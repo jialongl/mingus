@@ -221,6 +221,8 @@ Songs are hashed by their MPD ids.")
 
 Songs are hashed by their MPD ids")
 
+(defvar mingus-cur-lyrics-number nil)
+
 (defun mingus-clear-cache ()
   "Clear Mingus' caches."
   (interactive)
@@ -633,6 +635,7 @@ MAIN CONTROLS:
 mingus-help:       1
 mingus-playlist:   2
 mingus-browser:    3
+mingus-lyrics:     5
 mingus-dired-file: 0
 
 Global keys:
@@ -969,6 +972,7 @@ Or, you might show me how to use a function/string choice in customize ;)"
 (define-key mingus-global-map "\C-x\C-s" 'mingus-save-playlist)
 (define-key mingus-global-map "2" 'mingus)
 (define-key mingus-global-map "3" 'mingus-browse)
+(define-key mingus-global-map "5" 'mingus-lyrics)
 (define-key mingus-global-map "w" 'mingus-wake-up-call)
 (define-key mingus-global-map "]" 'mingus-enable-output)
 (define-key mingus-global-map "[" 'mingus-disable-output)
@@ -1444,6 +1448,9 @@ Or, you might show me how to use a function/string choice in customize ;)"
 
 (define-key mingus-browse-map " " 'mingus-insert)
 
+(defconst mingus-lyrics-map (copy-keymap mingus-global-map)
+  "Lyrics keymap for `mingus'")
+
 ;;;some generic functions:
 
 ;;;; {{xemacs compatibility}}
@@ -1876,7 +1883,7 @@ details : the car of the `details' text property.
 (defun mingus-buffer-p (&optional buffer)
   (member (or buffer (buffer-name))
           '("*Mingus Browser*" "*Mingus Help*"
-            "*Mingus*" "*Mingus Burns*")))
+            "*Mingus*" "*Mingus Burns*" "*Mingus Lyrics*")))
 
 (defun mingus-git-out (&optional x)
   "Bury all Mingus buffers."
@@ -1908,6 +1915,14 @@ see function `mingus-help' for instructions.
     (setq buffer-read-only t)
     (setq mingus-last-query-results res)))
 
+(defun mingus-lyrics-mode ()
+  "Mingus lyrics mode.
+\\{mingus-lyrics-map}"
+  (use-local-map mingus-lyrics-map)
+  (setq major-mode 'mingus-lyrics-mode)
+  (setq mode-name "Mingus-lyrics")
+  (setq buffer-read-only t))
+
 (defun mingus-mode-line-kill ()
   (interactive)
   (cancel-timer mingus-timer))
@@ -1921,7 +1936,8 @@ see function `mingus-help' for instructions.
                       '("*Mingus Browser*"
                         "*Mingus Help*"
                         "*Mingus*"
-                        "*Mingus Burns*")))
+                        "*Mingus Burns*"
+                        "*Mingus Lyrics*")))
           (propertize
            (mingus-make-mode-line-string)
            'help-echo (concat
@@ -3145,6 +3161,25 @@ Actually it tries to retrieve any stream from a given url.
        (or (re-search-forward ".*/" (point-at-eol) t 1) (point-at-bol))
        'invisible t)
       (forward-line 1))))
+
+(defun mingus-lyrics ()
+  "Switch to buffer *Mingus Lyrics* and view lyrics."
+  (interactive)
+  (if (and (= (mingus-cur-song-number) mingus-cur-lyrics-number)
+           (bufferp (get-buffer "*Mingus Lyrics*")))
+      (switch-to-buffer "*Mingus Lyrics*")
+    (let* ((song (mpd-get-current-song mpd-inter-conn))
+           (song-file-path (plist-get song 'file))
+           (song-relative-dir (file-name-directory song-file-path))
+           (lyrics-file-name (concat (plist-get song 'Title) ".lrc"))
+           (lyrics-file-path (concat mingus-mpd-root song-relative-dir lyrics-file-name)))
+
+      (setq mingus-cur-lyrics-number (mingus-cur-song-number))
+      (switch-to-buffer "*Mingus Lyrics*")
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (insert-file lyrics-file-path)
+      (mingus-lyrics-mode))))
 
 ;; fixme: Problem if a playlist is contained within.
 (defun* mingus-add-song-at-p (&optional beg end)
