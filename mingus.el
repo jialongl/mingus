@@ -451,9 +451,7 @@ Note that you can use tramp, as in
 
 (defcustom mingus-lyrics-root
   (expand-file-name
-   (concat (mingus-get-config-option
-            mingus-mpd-config-file
-            "lyrics_directory") "/"))
+   (concat mingus-mpd-root "lyrics/"))
   "Lyrics directory used by MPD."
   :group 'mingus
   :type '(string))
