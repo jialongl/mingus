@@ -449,6 +449,15 @@ Note that you can use tramp, as in
   :group 'mingus
   :type '(string))
 
+(defcustom mingus-lyrics-root
+  (expand-file-name
+   (concat (mingus-get-config-option
+            mingus-mpd-config-file
+            "lyrics_directory") "/"))
+  "Lyrics directory used by MPD."
+  :group 'mingus
+  :type '(string))
+
 (defcustom mingus-seek-amount 10
   "Default amount of seconds or percents to seek by when using `mingus-seek'."
   :group 'mingus
@@ -1921,6 +1930,7 @@ see function `mingus-help' for instructions.
   (use-local-map mingus-lyrics-map)
   (setq major-mode 'mingus-lyrics-mode)
   (setq mode-name "Mingus-lyrics")
+  (set-buffer-file-coding-system 'utf-8)
   (setq buffer-read-only t))
 
 (defun mingus-mode-line-kill ()
@@ -3169,16 +3179,15 @@ Actually it tries to retrieve any stream from a given url.
            (bufferp (get-buffer "*Mingus Lyrics*")))
       (switch-to-buffer "*Mingus Lyrics*")
     (let* ((song (mpd-get-current-song mpd-inter-conn))
-           (song-file-path (plist-get song 'file))
-           (song-relative-dir (file-name-directory song-file-path))
-           (lyrics-file-name (concat (plist-get song 'Title) ".lrc"))
-           (lyrics-file-path (concat mingus-mpd-root song-relative-dir lyrics-file-name)))
+           (song-name (plist-get song 'Title))
+           (lyrics-file (concat mingus-lyrics-root song-name ".lrc")))
 
       (setq mingus-cur-lyrics-number (mingus-cur-song-number))
       (switch-to-buffer "*Mingus Lyrics*")
       (setq buffer-read-only nil)
       (erase-buffer)
-      (insert-file lyrics-file-path)
+      (if (file-exists-p lyrics-file)
+          (insert-file lyrics-file))
       (mingus-lyrics-mode))))
 
 ;; fixme: Problem if a playlist is contained within.
