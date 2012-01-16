@@ -221,7 +221,7 @@ Songs are hashed by their MPD ids.")
 
 Songs are hashed by their MPD ids")
 
-(defvar mingus-cur-lyrics-number nil)
+(defvar mingus-cur-lyrics-number -1)
 
 (defun mingus-clear-cache ()
   "Clear Mingus' caches."
