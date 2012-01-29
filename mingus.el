@@ -698,7 +698,7 @@ M                       mingus-move-all
 C-l                     mingus-goto-current-song
 C-k                     mingus-move-up
 C-j                     mingus-move-down
-RET                     mingus-play
+RET,[mouse-3]           mingus-play
 SPC,m,[mouse-2]         mingus-mark
 * %%, y                  mingus-mark-regexp
 C-u * %%, Y              mingus-unmark-regexp
@@ -1385,6 +1385,14 @@ Or, you might show me how to use a function/string choice in customize ;)"
               :help "find file in dired"))
 
 ;; mouse keys
+(define-key mingus-playlist-map
+  (if (featurep 'xemacs) [button1] [mouse-1])
+  (lambda (ev)
+    (interactive "e")
+    (when mingus-use-mouse-p
+      (mouse-set-point ev)
+      (mingus-play))))
+
 (define-key mingus-playlist-map
   (if (featurep 'xemacs) [button2] [mouse-2])
   (lambda (ev)
