@@ -698,7 +698,7 @@ M                       mingus-move-all
 C-l                     mingus-goto-current-song
 C-k                     mingus-move-up
 C-j                     mingus-move-down
-RET,[mouse-3]           mingus-play
+RET,[mouse-1]           mingus-play
 SPC,m,[mouse-2]         mingus-mark
 * %%, y                  mingus-mark-regexp
 C-u * %%, Y              mingus-unmark-regexp
@@ -1391,7 +1391,10 @@ Or, you might show me how to use a function/string choice in customize ;)"
     (interactive "e")
     (when mingus-use-mouse-p
       (mouse-set-point ev)
-      (mingus-play))))
+      (case
+          (getf (mpd-get-status mpd-inter-conn) 'state)
+        ((stop) (mingus-play))
+        ((pause) (mingus-toggle))))))
 
 (define-key mingus-playlist-map
   (if (featurep 'xemacs) [button2] [mouse-2])
