@@ -192,17 +192,8 @@ class ttlyrics {
 
 
 	public static void main(String[] args) throws Exception {
-		int argc = args.length;
 		String artist = args[0];
-		String artist_u = encode(artist);
 		String title = args[1];
-		String title_u = encode(title);
-		String dashes = "---";
-
-		if (argc > 2) {
-			int lrcId = Integer.parseInt(args[2], 10);
-			System.out.println("code: " + verificationCode(artist, title, lrcId) + dashes);
-		}
 		System.out.println(search_and_download(title, artist));
 	}
 }
