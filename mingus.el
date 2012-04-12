@@ -3213,6 +3213,7 @@ If active region, add everything between BEG and END."
                             (format "add %s" (mpd-safe-string song)))
                           (split-string song "\n") "\n"))))
 
+(defconst mingus-play-song-when-inserted t)
 (defun mingus-down-dir-or-play-song ()
   "In *Mingus Browser* buffer, go to dir at point, or play song at point."
   (interactive)
@@ -3220,7 +3221,7 @@ If active region, add everything between BEG and END."
     (beginning-of-line)
     (cond
      ((mingus-songp)                    ;is it a song?
-      (mingus-insert))
+      (mingus-insert mingus-play-song-when-inserted))
      ((mingus-playlistp)                ;is it a playlist?
       (mpd-load-playlist mpd-inter-conn (cdr (mingus-playlistp))))
      (t                                 ;it's  a directory!
