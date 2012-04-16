@@ -3193,13 +3193,14 @@ Actually it tries to retrieve any stream from a given url.
            (song-name (plist-get song 'Title))
            (lyrics-file (concat mingus-lyrics-root song-name ".lrc")))
 
-      (setq mingus-cur-lyrics-number (mingus-cur-song-number))
-      (switch-to-buffer "*Mingus Lyrics*")
-      (setq buffer-read-only nil)
-      (erase-buffer)
       (if (file-exists-p lyrics-file)
-          (insert-file lyrics-file))
-      (mingus-lyrics-mode))))
+          (progn (setq mingus-cur-lyrics-number (mingus-cur-song-number))
+                 (switch-to-buffer "*Mingus Lyrics*")
+                 (setq buffer-read-only nil)
+                 (erase-buffer)
+                 (insert-file lyrics-file)
+                 (mingus-lyrics-mode))
+        (message "Lyrics not found.")))))
 
 ;; fixme: Problem if a playlist is contained within.
 (defun* mingus-add-song-at-p (&optional beg end)
