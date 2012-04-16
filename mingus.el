@@ -2446,11 +2446,13 @@ Actually it is just named after that great bass player."
  (and (member 'updating_db (mpd-get-status mpd-inter-conn))
       (message "Updating DB")))
 
-(mingus-define-mpd->mingus mingus-pause
-                           (mingus-minibuffer-feedback 'state)
-                           (mingus-set-NP-mark t))
-
-(defalias 'mingus-toggle 'mingus-pause)
+(defun mingus-toggle ()
+  (interactive)
+  (if (string= (symbol-name (getf (mpd-get-status mpd-inter-conn) 'state)) "stop")
+      (mpd-play  mpd-inter-conn)
+    (mpd-pause mpd-inter-conn))
+  (mingus-minibuffer-feedback 'state)
+  (mingus-set-NP-mark t))
 
 (mingus-define-mpd->mingus
  mingus-prev
