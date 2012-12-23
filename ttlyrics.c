@@ -271,13 +271,14 @@ int main (int argc, char **argv) {
 	xmlFreeNode(node0);
 
 	int chosen_id = 0;
-	if (i_results > 0) {
+	if (i_results > 1) {
 		printf("Choose one (the index, 0 based): ");
 		scanf("%d", &chosen_id);
 		if (chosen_id >= i_results)
 			chosen_id = i_results - 1;
 
-	} else {
+	} else if (i_results == 0) {
+
 		fprintf(stderr, "Notice: No results were returned. Quiting.\n");
 		exit(EXIT_FAILURE);
 	}
