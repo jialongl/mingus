@@ -1,5 +1,6 @@
 /*
-  gcc -Wall -std=c99 -o ttlyrics ttlyrics.c -lcurl -lxml2 -I/usr/include/libxml2/
+  gcc -Wall -std=c99 -o ttlyrics ttlyrics.c -lcurl -lxml2 -I/usr/include/libxml2/ && \
+  ./ttlyrics beyond 摩登时代
 */
 
 #include <ctype.h>
@@ -34,7 +35,7 @@ char search_res[4096];
 //     in UTF-8 format (UTF-8 != unicode). Each such char occupies 3 bytes.
 //     for example, strlen("摩登时代") == 12.
 //  4. therefore, "to" should be at least 4/3 times strlen() of "from".
-void uniEncode (char *from, char *to) {
+void uni_encode (char *from, char *to) {
 	int n = strlen(from);
 	if (n == 0) {
 		to[0] = '\0';
@@ -80,7 +81,7 @@ void uniEncode (char *from, char *to) {
 //   in fact, it is mostly C (the bit ops). Translation was no sweat. XD
 // Notes:
 //   1. this func expects "artist" and "title" to be char* (thus in utf-8 format).
-int ttCode (char *artist, char *title, int lrcId) {
+int tt_code (char *artist, char *title, int lrcId) {
 	char bytes[512];
 	sprintf(bytes, "%s%s", artist, title);
 
@@ -143,8 +144,7 @@ int ttCode (char *artist, char *title, int lrcId) {
 // that amount differs from the amount passed to your function,
 // it'll signal an error to the library. This will abort the
 // transfer and return CURLE_WRITE_ERROR.
-
-size_t procXml (char *ptr, size_t size, size_t nmemb, void *userdata) {
+size_t proc_xml (char *ptr, size_t size, size_t nmemb, void *userdata) {
 	size_t l = size * nmemb;
 	for (int c = 0; c < l; c++) {
 		search_res[c] = ptr[c];
@@ -190,7 +190,7 @@ int main (int argc, char **argv) {
 	str_tolower(argv[1]);
 	str_rmchar(argv[1], t1, ' ');
 	str_rmchar(t1, argv[1], '\'');
-	uniEncode(argv[1], artist);
+	uni_encode(argv[1], artist);
 
 	int l2 = strlen(argv[2]);
 	char title[4 * l2];
@@ -198,7 +198,7 @@ int main (int argc, char **argv) {
 	str_tolower(argv[2]);
 	str_rmchar(argv[2], t2, ' ');
 	str_rmchar(t2, argv[2], '\'');
-	uniEncode(argv[2], title);
+	uni_encode(argv[2], title);
 
 	char url_s[512];
 	sprintf(url_s, URL_SEARCH_FMTSTR, artist, title);
@@ -208,7 +208,7 @@ int main (int argc, char **argv) {
 	CURL *curl0;
 	curl0 = curl_easy_init();
 	curl_easy_setopt(curl0, CURLOPT_URL, url_s);
-	curl_easy_setopt(curl0, CURLOPT_WRITEFUNCTION, &procXml);
+	curl_easy_setopt(curl0, CURLOPT_WRITEFUNCTION, &proc_xml);
 
 	curl_easy_perform(curl0);
 
@@ -288,7 +288,7 @@ int main (int argc, char **argv) {
 	int lrcId = si[chosen_id].id;
 	sprintf(url_d, URL_DOWNLOAD_FMTSTR,
 	        lrcId,
-	        ttCode(si[chosen_id].artist, si[chosen_id].title, lrcId));
+	        tt_code(si[chosen_id].artist, si[chosen_id].title, lrcId));
 
 	curl_easy_setopt(curl0, CURLOPT_URL, url_d);
 	curl_easy_setopt(curl0, CURLOPT_WRITEFUNCTION, NULL);
