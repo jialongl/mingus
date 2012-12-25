@@ -146,9 +146,7 @@ int tt_code (char *artist, char *title, int lrcId) {
 // transfer and return CURLE_WRITE_ERROR.
 size_t proc_xml (char *ptr, size_t size, size_t nmemb, void *userdata) {
 	size_t l = size * nmemb;
-	for (int c = 0; c < l; c++) {
-		search_res[c] = ptr[c];
-	}
+	strncpy(search_res, ptr, l);
 	return l;
 }
 
@@ -236,8 +234,8 @@ int main (int argc, char **argv) {
 	}
 
 	xmlAttr *a;
-	struct song_info si[8];
-	int i_results = 0;
+	struct song_info si[10]; // 10 results returned at most. I could be wrong.
+	int n_res = 0;
 
 	node0 = node0->xmlChildrenNode;
 	while (node0 != NULL) {
@@ -252,32 +250,38 @@ int main (int argc, char **argv) {
 			xmlChar *val = xmlNodeListGetString(a->doc, a->children, 1);
 
 			if        (xmlStrcmp(a->name, (const xmlChar *) "id") == 0) {
-				si[i_results].id = atoi((const char *) val);
+				si[n_res].id = atoi((const char *) val);
 
 			} else if (xmlStrcmp(a->name, (const xmlChar *) "artist") == 0) {
-				strcpy(si[i_results].artist, (const char *) val);
+				strncpy(si[n_res].artist, (const char *) val, 128);
 
 			} else if (xmlStrcmp(a->name, (const xmlChar *) "title") == 0) {
-				strcpy(si[i_results].title, (const char *) val);
+				strncpy(si[n_res].title,  (const char *) val, 256);
 			}
 			xmlFree(val);
 			a = a->next;
 		}
 
 		node0 = node0->next;
-		i_results++;
+		n_res++;
 	}
 	xmlFreeDoc(res_xml);
 	xmlFreeNode(node0);
 
 	int chosen_id = 0;
-	if (i_results > 1) {
+	if (n_res > 1) {
 		printf("Choose one (the index, 0 based): ");
-		scanf("%d", &chosen_id);
-		if (chosen_id >= i_results)
-			chosen_id = i_results - 1;
+		if (argc >= 4)
+			chosen_id = atoi(argv[3]);
+		else
+			scanf("%d", &chosen_id);
 
-	} else if (i_results == 0) {
+		if (chosen_id >= n_res)
+			chosen_id = n_res - 1;
+		else if (chosen_id < 0)
+			chosen_id = 0;
+
+	} else if (n_res == 0) {
 
 		fprintf(stderr, "Notice: No results were returned. Quiting.\n");
 		exit(EXIT_FAILURE);
