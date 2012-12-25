@@ -270,7 +270,7 @@ int main (int argc, char **argv) {
 
 	int chosen_id = 0;
 	if (n_res > 1) {
-		printf("Choose one (the index, 0 based): ");
+		fprintf(stderr, "Choose one (the index, 0 based): ");
 		if (argc >= 4)
 			chosen_id = atoi(argv[3]);
 		else
