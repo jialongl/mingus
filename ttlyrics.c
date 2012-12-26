@@ -52,15 +52,10 @@ void uni_encode (char *from, char *to) {
 	int l = wcslen(ws);
 
 	for (int i = 0; i < l; i++) {
-// "%4lx" triggers warning on Windows, and "%4x" on Linux. I don't like warnings.
-#ifdef __linux__
-		sprintf(unicode_hexs + 4*i, "%4lx", ws[i]);
-
-#elif __CYGWIN__
+#ifdef _LP64
 		sprintf(unicode_hexs + 4*i, "%4x", ws[i]);
-
-#elif __APPLE__
-		// HELP!
+#else
+		sprintf(unicode_hexs + 4*i, "%4lx", ws[i]);
 #endif
 	}
 
