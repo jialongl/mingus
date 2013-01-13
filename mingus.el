@@ -451,7 +451,7 @@ Note that you can use tramp, as in
 
 (defcustom mingus-lyrics-root
   (expand-file-name
-   (concat mingus-mpd-root "lyrics/"))
+   (concat mingus-mpd-root ".lyrics/"))
   "Lyrics directory used by MPD."
   :group 'mingus
   :type '(string))
@@ -3191,7 +3191,7 @@ Actually it tries to retrieve any stream from a given url.
       (switch-to-buffer "*Mingus Lyrics*")
     (let* ((song (mpd-get-current-song mpd-inter-conn))
            (song-name (plist-get song 'Title))
-           (lyrics-file (concat mingus-lyrics-root song-name ".lrc")))
+           (lyrics-file (encode-coding-string (concat mingus-lyrics-root (downcase song-name) ".lrc") 'utf-8)))
 
       (if (file-exists-p lyrics-file)
           (progn (setq mingus-cur-lyrics-number (mingus-cur-song-number))
