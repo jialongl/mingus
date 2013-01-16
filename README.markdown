@@ -1,20 +1,21 @@
 Mingus is a frontend for GNU Emacs to the Music Player daemon. The
 interface closely, though not strictly, resembles that of ncmpc, which
-I had been using before (the main drawback of ncmpc for me was it’s
+I had been using before (the main drawback of ncmpc for me was its
 apparent lack of support for unicode). It has some advantages over
 other clients, mainly in the field of playlist editing. This is
-achieved through marking and regions as you are used too in emacs and
-in dired. Mingus also provides a point-of-insertion for inserting new
+achieved through marking regions as you used to in, say, Dired.
+Mingus also provides a point-of-insertion for inserting new
 songs. This can be handy to drop a song after the currently playing
 one (enqueue), but is more flexible. Mingus is distributed under the
 GPL.
 
 w3m
 ===
-Another plus is its integration with emacs-w3m , in the sense that,
+Another plus is its integration with [emacs-w3m](http://emacs-w3m.namazu.org/),
+in the sense that,
 when bumping into a sexy podcast or radio-stream while browsing in
 the browser of browsers, you have the ability to add any stream at
-point (and play it directly, if so desired).
+the point (and play it directly, if so desired).
 
 Dired
 =====
@@ -35,11 +36,11 @@ Mingus with version >= 0.32 (Fleurette Africaine) has bookmarks to
 remember filename and position. This can be very useful with
 audiobooks or working with language courses.
 
-Global bookmarking shortcuts C-x r b and C-x r m are overwritten in
-Mingus' global map to have alike functionality, and C-x r d is set to
-mingus-bookmark-delete. The function mingus-bookmark-set (C-x r b)
-takes currently playing file + its current elapsed time. Buffer
-position is ignored. Mingus-bookmark-jump will jump to a bookmark. It
+Global bookmarking shortcuts `C-x r b` and `C-x r m` are rewritten in
+Mingus' global map to provide functionality alike, and `mingus-bookmark-delete`
+(`C-x r d`) is added. The function `mingus-bookmark-set` (`C-x r m`) records
+the currently playing file and its current elapsed time. Position of the cursor
+in the buffer is ignored. `mingus-bookmark-jump` jumps to a bookmark. It
 inserts the file into the current playlist when it is not yet there.
 
 Mingus stays home
@@ -54,7 +55,7 @@ editing.
 
 Prerequisites
 =============
-libmpdee.el by R. Ramkumar. Currently mingus runs on GNU Emacs22 and
+`libmpdee.el` by R. Ramkumar. Currently mingus runs on GNU Emacs22 and
 GNU Emacs 23. If you also want to use mingus-stays-home.el, cdrecord (or
 any other command-line cd-burning tool taking files as arguments) might
 be needed.
