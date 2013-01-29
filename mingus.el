@@ -3190,8 +3190,9 @@ Actually it tries to retrieve any stream from a given url.
            (bufferp (get-buffer "*Mingus Lyrics*")))
       (switch-to-buffer "*Mingus Lyrics*")
     (let* ((song (mpd-get-current-song mpd-inter-conn))
-           (song-name (plist-get song 'Title))
-           (lyrics-file (encode-coding-string (concat mingus-lyrics-root (downcase song-name) ".lrc") 'utf-8)))
+           (song-artist (encode-coding-string (downcase (plist-get song 'Artist)) 'utf-8))
+           (song-name   (encode-coding-string (downcase (plist-get song 'Title )) 'utf-8))
+           (lyrics-file (concat mingus-lyrics-root song-name ".lrc")))
 
       (if (file-exists-p lyrics-file)
           (progn (setq mingus-cur-lyrics-number (mingus-cur-song-number))
@@ -3200,7 +3201,10 @@ Actually it tries to retrieve any stream from a given url.
                  (erase-buffer)
                  (insert-file lyrics-file)
                  (mingus-lyrics-mode))
-        (message "Lyrics not found.")))))
+
+        (progn (shell-command (concat "/home/jialongl/devel/mingus/ttlyrics " song-artist " " song-name " 0 > " mingus-lyrics-root song-name ".lrc"))
+               (mingus-lyrics))
+        ))))
 
 ;; fixme: Problem if a playlist is contained within.
 (defun* mingus-add-song-at-p (&optional beg end)
