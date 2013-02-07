@@ -3198,7 +3198,7 @@ Actually it tries to retrieve any stream from a given url.
                  (switch-to-buffer "*Mingus Lyrics*")
                  (setq buffer-read-only nil)
                  (erase-buffer)
-                 (insert-file lyrics-file)
+                 (insert-file-contents lyrics-file)
                  (mingus-lyrics-mode))
         (message "Lyrics not found.")))))
 
