@@ -3624,7 +3624,7 @@ Argument POS is the current position in the buffer to revert to (?)."
                   else 
                   collect i into list
                   finally return list))))))
-      (flet ((prop (i)
+      (cl-flet ((prop (i)
                    (propertize 
                     (cdr i)
                     'face
