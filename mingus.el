@@ -3183,6 +3183,24 @@ Actually it tries to retrieve any stream from a given url.
        'invisible t)
       (forward-line 1))))
 
+(defvar str-encoding 'utf-8)
+
+(defun display-lyrics-with-file (fpath)
+  (progn (setq mingus-cur-lyrics-number (mingus-cur-song-number))
+         (switch-to-buffer "*Mingus Lyrics*")
+         (setq buffer-read-only nil)
+         (erase-buffer)
+         (insert-file-contents fpath)
+         (mingus-lyrics-mode)))
+
+(defun mingus-lyrics-dl-compl-hook (process event)
+  (if (string= event "finished\n")
+      (let* ((song (mpd-get-current-song mpd-inter-conn))
+             (song-name (encode-coding-string (downcase (plist-get song 'Title)) str-encoding))
+             (lyrics-fpath
+              (encode-coding-string (concat mingus-lyrics-root (downcase song-name) ".lrc") str-encoding)))
+        (display-lyrics-with-file lyrics-fpath))))
+
 (defun mingus-lyrics ()
   "Switch to buffer *Mingus Lyrics* and view lyrics."
   (interactive)
@@ -3190,20 +3208,20 @@ Actually it tries to retrieve any stream from a given url.
            (bufferp (get-buffer "*Mingus Lyrics*")))
       (switch-to-buffer "*Mingus Lyrics*")
     (let* ((song (mpd-get-current-song mpd-inter-conn))
-           (song-artist (encode-coding-string (downcase (plist-get song 'Artist)) 'utf-8))
-           (song-name   (encode-coding-string (downcase (plist-get song 'Title )) 'utf-8))
-           (lyrics-file (concat mingus-lyrics-root song-name ".lrc")))
+           (song-artist (encode-coding-string (downcase (plist-get song 'Artist)) str-encoding))
+           (song-name   (encode-coding-string (downcase (plist-get song 'Title )) str-encoding))
+           (lyrics-fpath
+            (encode-coding-string (concat mingus-lyrics-root (downcase song-name) ".lrc") str-encoding)))
 
-      (if (file-exists-p lyrics-file)
-          (progn (setq mingus-cur-lyrics-number (mingus-cur-song-number))
-                 (switch-to-buffer "*Mingus Lyrics*")
-                 (setq buffer-read-only nil)
-                 (erase-buffer)
-                 (insert-file-contents lyrics-file)
-                 (mingus-lyrics-mode))
+      (if (file-exists-p lyrics-fpath)
+          (display-lyrics-with-file lyrics-fpath)
 
-        (progn (shell-command (concat "/home/jialongl/devel/mingus/ttlyrics " song-artist " " song-name " 0 > " mingus-lyrics-root song-name ".lrc"))
-               (mingus-lyrics))
+        (progn
+          (start-process-shell-command
+           "ttlyrics"
+           "*Mingus Lyrics*"
+           (concat "/home/jialongl/devel/mingus/ttlyrics \"" song-artist "\" \"" song-name "\" 0 > " mingus-lyrics-root "\""song-name ".lrc\""))
+          (set-process-sentinel (get-process "ttlyrics") 'mingus-lyrics-dl-compl-hook))
         ))))
 
 ;; fixme: Problem if a playlist is contained within.
